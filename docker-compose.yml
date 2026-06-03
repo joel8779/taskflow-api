@@ -1,0 +1,82 @@
+services:
+  # ── PostgreSQL Database ───────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: taskflow_db
+      POSTGRES_USER: taskflow_user
+      POSTGRES_PASSWORD: taskflow_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docs/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./docs/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskflow_user -d taskflow_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - taskflow-network
+
+  # ── Spring Boot API ───────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskflow-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/taskflow_db
+      DB_USERNAME: taskflow_user
+      DB_PASSWORD: taskflow_pass
+      JWT_SECRET: ${JWT_SECRET:-taskflow-jwt-secret-key-for-development-only-change-in-production}
+      JWT_EXPIRATION_MS: 86400000
+      SERVER_PORT: 8080
+      DDL_AUTO: update
+      LOG_LEVEL: INFO
+      CORS_ORIGINS: http://localhost:3000,http://localhost:5173,http://localhost:80
+    ports:
+      - "8080:8080"
+    volumes:
+      - app_logs:/app/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    networks:
+      - taskflow-network
+
+  # ── React Frontend ────────────────────────────────────────────────
+  ui:
+    build:
+      context: ./taskflow-ui
+      dockerfile: Dockerfile
+    container_name: taskflow-ui
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks:
+      - taskflow-network
+
+volumes:
+  postgres_data:
+    name: taskflow_postgres_data
+  app_logs:
+    name: taskflow_app_logs
+
+networks:
+  taskflow-network:
+    name: taskflow-network
+    driver: bridge

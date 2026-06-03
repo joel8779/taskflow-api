@@ -1,0 +1,97 @@
+# ========================================
+# TaskFlow API - Application Configuration
+# ========================================
+
+spring:
+  application:
+    name: taskflow-api
+
+  # Database Configuration
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/taskflow_db}
+    username: ${DB_USERNAME:taskflow_user}
+    password: ${DB_PASSWORD:taskflow_pass}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      pool-name: TaskFlowHikariPool
+
+  # JPA / Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:update}
+    show-sql: ${SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  # Jackson
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
+    default-property-inclusion: non_null
+
+# Server
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-binding-errors: never
+
+# JWT Configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:taskflow-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}        # 24 hours
+    refresh-expiration-ms: ${JWT_REFRESH_MS:604800000}  # 7 days
+
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:5173}
+
+# SpringDoc / Swagger UI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+  info:
+    title: TaskFlow API
+    description: Employee Task & Incident Management System
+    version: 1.0.0
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Logging
+logging:
+  level:
+    com.taskflow: ${LOG_LEVEL:INFO}
+    org.springframework.security: WARN
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:WARN}
+    org.springframework.web.servlet: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_PATH:logs}/taskflow-api.log

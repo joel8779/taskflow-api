@@ -1,0 +1,10 @@
+# Treat frontend taskflow-ui as vendored/generated code to exclude it from GitHub language statistics.
+# This ensures that GitHub correctly displays this project as a Java/SpringBoot repository.
+taskflow-ui/** linguist-vendored
+taskflow-ui/* linguist-vendored
+*.js linguist-vendored
+*.jsx linguist-vendored
+*.ts linguist-vendored
+*.tsx linguist-vendored
+*.css linguist-vendored
+*.html linguist-vendored
