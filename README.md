@@ -1,8 +1,10 @@
 # TaskFlow API
 
+[![CI/CD Pipeline](https://github.com/joel8779/taskflow-api/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/joel8779/taskflow-api/actions/workflows/ci-cd.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/joel8779/taskflow-api)](https://github.com/joel8779/taskflow-api/commits/main)
+
 > **Employee Task & Incident Management System** — Clean REST API built with Spring Boot 3, JWT Authentication, and PostgreSQL.
 
-[![CI/CD Pipeline](https://github.com/joel8779/taskflow-api/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/joel8779/taskflow-api/actions)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.org/projects/jdk/17/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.3-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
